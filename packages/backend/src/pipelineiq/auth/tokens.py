@@ -79,4 +79,3 @@ def create_oauth_state(settings: Settings) -> str:
         lifetime=timedelta(minutes=10),
         settings=settings,
     )
-

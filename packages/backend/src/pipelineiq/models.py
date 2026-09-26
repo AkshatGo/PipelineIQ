@@ -274,11 +274,147 @@ class AutoFixMemory(Document):
         name = "autofix_memories"
         use_state_management = True
         indexes = [
-            IndexModel(
-                [("workspace_id", ASCENDING), ("error_signature", ASCENDING)], unique=True
-            ),
+            IndexModel([("workspace_id", ASCENDING), ("error_signature", ASCENDING)], unique=True),
             IndexModel([("repository_full_name", ASCENDING), ("error_signature", ASCENDING)]),
             "approved_for_auto_merge",
+        ]
+
+
+class WorkspaceParticipant(BaseModel):
+    user_id: PydanticObjectId
+    role: str = "editor"  # owner, editor, reviewer, viewer
+    joined_at: datetime = Field(default_factory=utc_now)
+    last_active_at: datetime = Field(default_factory=utc_now)
+    presence: dict[str, Any] = Field(default_factory=dict)
+
+
+class CollaborativeWorkspace(Document):
+    incident_id: PydanticObjectId
+    workspace_id: str  # UUID for frontend
+    repository_full_name: str
+    base_branch: str
+    head_branch: str
+    head_sha: str
+    owner_id: PydanticObjectId
+    participants: list[WorkspaceParticipant] = Field(default_factory=list)
+    status: str = (
+        "initializing"  # initializing, active, validating, awaiting_approval, resolved, closed
+    )
+    created_at: datetime = Field(default_factory=utc_now)
+    updated_at: datetime = Field(default_factory=utc_now)
+    last_synced_at: datetime | None = None
+
+    class Settings:
+        name = "collaborative_workspaces"
+        use_state_management = True
+        indexes = [
+            "incident_id",
+            "owner_id",
+            "status",
+            IndexModel([("updated_at", DESCENDING)]),
+        ]
+
+
+class WorkspaceDocument(Document):
+    workspace_id: PydanticObjectId
+    path: str
+    language: str
+    content: str  # Current Yjs state (base64 encoded)
+    original_content: str
+    version: int = 0
+    last_modified_by: PydanticObjectId
+    last_modified_at: datetime = Field(default_factory=utc_now)
+    is_binary: bool = False
+    yjs_state: bytes | None = None  # Binary Yjs document state
+
+    class Settings:
+        name = "workspace_documents"
+        use_state_management = True
+        indexes = [
+            IndexModel([("workspace_id", ASCENDING), ("path", ASCENDING)], unique=True),
+        ]
+
+
+class DocumentVersion(Document):
+    workspace_id: PydanticObjectId
+    document_id: PydanticObjectId
+    version_number: int
+    parent_version_id: PydanticObjectId | None = None
+    content_snapshot: str
+    operations: list[dict[str, Any]] = Field(default_factory=list)
+    author_id: PydanticObjectId
+    author_type: str  # human, ai, system
+    message: str
+    tags: list[str] = Field(default_factory=list)
+    ci_run_id: PydanticObjectId | None = None
+    ci_status: str | None = None
+    ci_url: str | None = None
+    created_at: datetime = Field(default_factory=utc_now)
+
+    class Settings:
+        name = "document_versions"
+        use_state_management = True
+        indexes = [
+            IndexModel(
+                [
+                    ("workspace_id", ASCENDING),
+                    ("document_id", ASCENDING),
+                    ("version_number", DESCENDING),
+                ]
+            ),
+            "author_id",
+            "tags",
+        ]
+
+
+class IncidentEvent(Document):
+    incident_id: PydanticObjectId
+    workspace_id: PydanticObjectId
+    actor_id: PydanticObjectId
+    actor_type: str  # human, ai, system, webhook
+    actor_name: str
+    type: str
+    action: str
+    description: str
+    document_id: PydanticObjectId | None = None
+    version_id: PydanticObjectId | None = None
+    before: dict[str, Any] = Field(default_factory=dict)
+    after: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    correlation_id: str | None = None
+    causation_id: str | None = None
+    timestamp: datetime = Field(default_factory=utc_now)
+
+    class Settings:
+        name = "incident_events"
+        use_state_management = True
+        indexes = [
+            IndexModel([("incident_id", ASCENDING), ("timestamp", ASCENDING)]),
+            IndexModel([("workspace_id", ASCENDING), ("timestamp", DESCENDING)]),
+            "actor_id",
+            "actor_type",
+            "type",
+        ]
+
+
+class ValidationRun(Document):
+    workspace_id: PydanticObjectId
+    version_id: PydanticObjectId
+    triggered_by: PydanticObjectId
+    status: str = "pending"  # pending, running, passed, failed
+    stages: list[dict[str, Any]] = Field(default_factory=list)
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
+    logs: list[str] = Field(default_factory=list)
+    created_at: datetime = Field(default_factory=utc_now)
+
+    class Settings:
+        name = "validation_runs"
+        use_state_management = True
+        indexes = [
+            IndexModel([("workspace_id", ASCENDING), ("created_at", DESCENDING)]),
+            "version_id",
+            "status",
         ]
 
 
@@ -291,4 +427,9 @@ DOCUMENT_MODELS = [
     AutoFixExecution,
     AutoFixFeedback,
     AutoFixMemory,
+    CollaborativeWorkspace,
+    WorkspaceDocument,
+    DocumentVersion,
+    IncidentEvent,
+    ValidationRun,
 ]

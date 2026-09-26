@@ -161,6 +161,7 @@ export interface PipelineRunResponse {
   workspace_id: string;
   installation_id?: number;
   repository_full_name: string;
+  repo_full_name?: string;
   delivery_id: string;
   event_type: string;
   action?: string;
@@ -170,6 +171,8 @@ export interface PipelineRunResponse {
   workflow_url?: string;
   branch?: string;
   commit_sha?: string;
+  commit_message?: string;
+  commit_url?: string;
   triggered_by?: string;
   conclusion?: string;
   health_status: string;
@@ -204,6 +207,8 @@ export interface PipelineRunResponse {
   monitor_model?: string;
   raw_event: Record<string, any>;
   enriched_event: Record<string, any>;
+  started_at?: string;
+  completed_at?: string;
   created_at: string;
   updated_at: string;
 }
@@ -282,17 +287,7 @@ export interface AutoFixReportResponse {
   pipeline_run: PipelineRunResponse;
 }
 
-export interface AutoFixReportDecisionRequest {
-  decision: "approve" | "reject";
-  note?: string;
-}
 
-export interface AutoFixFeedbackRequest {
-  outcome: "resolved" | "partially_resolved" | "not_resolved";
-  automation_quality: "excellent" | "acceptable" | "poor";
-  should_auto_apply_similar: boolean;
-  notes?: string;
-}
 
 export interface DiagnosisResponse {
   error_type: string;
@@ -302,4 +297,161 @@ export interface DiagnosisResponse {
   provider: string;
   model: string;
   raw_response: string;
+}
+
+export type WorkspaceRole = "owner" | "editor" | "reviewer" | "viewer";
+export type WorkspaceStatus = "initializing" | "active" | "validating" | "awaiting_approval" | "resolved" | "closed";
+export type ActorType = "human" | "ai" | "system" | "webhook";
+
+export interface WorkspaceParticipant {
+  user_id: string;
+  role: WorkspaceRole;
+  joined_at: string;
+  last_active_at: string;
+  presence: Record<string, any>;
+}
+
+export interface CollaborativeWorkspaceCreate {
+  incident_id: string;
+  repository_full_name: string;
+  base_branch: string;
+  head_branch: string;
+  head_sha: string;
+}
+
+export interface CollaborativeWorkspaceResponse {
+  id: string;
+  incident_id: string;
+  workspace_id: string;
+  repository_full_name: string;
+  base_branch: string;
+  head_branch: string;
+  head_sha: string;
+  owner_id: string;
+  participants: WorkspaceParticipant[];
+  status: WorkspaceStatus;
+  created_at: string;
+  updated_at: string;
+  last_synced_at?: string;
+}
+
+export interface WorkspaceDocumentResponse {
+  id: string;
+  workspace_id: string;
+  path: string;
+  language: string;
+  content: string;
+  original_content: string;
+  version: number;
+  last_modified_by: string;
+  last_modified_at: string;
+  is_binary: boolean;
+}
+
+export interface DocumentVersionResponse {
+  id: string;
+  workspace_id: string;
+  document_id: string;
+  version_number: number;
+  parent_version_id?: string;
+  content_snapshot: string;
+  operations: Record<string, any>[];
+  author_id: string;
+  author_type: ActorType;
+  message: string;
+  tags: string[];
+  ci_run_id?: string;
+  ci_status?: string;
+  ci_url?: string;
+  created_at: string;
+}
+
+export interface IncidentEventResponse {
+  id: string;
+  incident_id: string;
+  workspace_id: string;
+  actor_id: string;
+  actor_type: ActorType;
+  actor_name: string;
+  type: string;
+  action: string;
+  description: string;
+  document_id?: string;
+  version_id?: string;
+  before: Record<string, any>;
+  after: Record<string, any>;
+  metadata: Record<string, any>;
+  correlation_id?: string;
+  causation_id?: string;
+  timestamp: string;
+}
+
+export interface ValidationStageResultResponse {
+  name: string;
+  status: string;
+  command: string;
+  output?: string;
+  error?: string;
+  started_at?: string;
+  completed_at?: string;
+}
+
+export interface ValidationRunResponse {
+  id: string;
+  workspace_id: string;
+  version_id: string;
+  triggered_by: string;
+  status: string;
+  stages: ValidationStageResultResponse[];
+  started_at?: string;
+  completed_at?: string;
+  logs: string[];
+  created_at: string;
+}
+
+export interface CreateCheckpointRequest {
+  message: string;
+  tags: string[];
+}
+
+export interface RestoreVersionRequest {
+  version_id: string;
+}
+
+export interface SyncStatus {
+  type: "online" | "syncing" | "offline" | "conflict" | "error";
+  lastSynced?: string;
+  progress?: number;
+  pendingCount?: number;
+  message?: string;
+  retry?: () => void;
+}
+
+export interface YjsAwarenessState {
+  user: { id: string; name: string; color: string };
+  cursor?: { anchor: number; head: number };
+  selection?: { anchor: number; head: number };
+  documentId?: string;
+}
+
+export type AuditActorType = "human" | "ai" | "system" | "webhook";
+
+export interface AuditEventFilter {
+  actor_type?: AuditActorType;
+  event_type?: string;
+  actor_id?: string;
+  document_id?: string;
+  from_timestamp?: string;
+  to_timestamp?: string;
+  limit?: number;
+}
+
+export interface AuditEventSummary {
+  total_events: number;
+  actor_type_breakdown: Record<string, number>;
+  event_type_breakdown: Record<string, number>;
+  time_range: {
+    earliest?: string;
+    latest?: string;
+  };
 }

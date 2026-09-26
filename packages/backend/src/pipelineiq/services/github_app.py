@@ -51,9 +51,7 @@ def generate_jwt(app_id: str, private_key_pem: str) -> str:
         "exp": now + 600,
         "iss": app_id,
     }
-    private_key = serialization.load_pem_private_key(
-        private_key_pem.encode(), password=None
-    )
+    private_key = serialization.load_pem_private_key(private_key_pem.encode(), password=None)
     return pyjwt.encode(payload, private_key, algorithm="RS256")  # type: ignore[arg-type]
 
 
@@ -165,6 +163,21 @@ class GitHubAppClient:
             )
         if response.is_error:
             raise GitHubAppError(f"Failed to get compare: {response.text}")
+        return response.json()  # type: ignore[no-any-return]
+
+    async def get_tree(
+        self, installation_id: int, owner: str, repo: str, tree_sha: str, recursive: bool = True
+    ) -> dict[str, Any]:
+        """Get a tree from the repository."""
+        async with httpx.AsyncClient(timeout=15) as client:
+            params = {"recursive": "1"} if recursive else {}
+            response = await client.get(
+                f"{self.settings.GITHUB_API_URL}/repos/{owner}/{repo}/git/trees/{tree_sha}",
+                headers=await self._get_headers(installation_id),
+                params=params,
+            )
+        if response.is_error:
+            raise GitHubAppError(f"Failed to get tree: {response.text}")
         return response.json()  # type: ignore[no-any-return]
 
     async def create_pull_request(

@@ -73,9 +73,9 @@ async def owned_workspace_or_404(workspace_id: str, owner_id: str) -> Workspace:
 async def list_workspaces(request: Request) -> list[WorkspaceResponse]:
     owner_id = await require_owner_id(request)
     owner_object_id = PydanticObjectId(owner_id)
-    workspaces = await Workspace.find(Workspace.owner_id == owner_object_id).sort(
-        "-created_at"
-    ).to_list()
+    workspaces = (
+        await Workspace.find(Workspace.owner_id == owner_object_id).sort("-created_at").to_list()
+    )
     return [workspace_response(workspace) for workspace in workspaces]
 
 
@@ -125,9 +125,7 @@ async def delete_workspace(request: Request, workspace_id: str) -> dict[str, str
     ):
         await model.get_motor_collection().delete_many({"workspace_id": workspace_id_value})
     if installation_id is not None:
-        await WebhookEvent.get_motor_collection().delete_many(
-            {"installation_id": installation_id}
-        )
+        await WebhookEvent.get_motor_collection().delete_many({"installation_id": installation_id})
     return {"detail": "Workspace deleted"}
 
 

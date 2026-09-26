@@ -9,4 +9,3 @@ router = APIRouter(prefix="/risk", tags=["risk"])
 @router.post("/assess", response_model=RiskAssessment)
 async def create_risk_assessment(payload: RiskAssessmentRequest) -> RiskAssessment:
     return assess_risk(payload.signals, payload.profile)
-

@@ -295,3 +295,149 @@ class DiagnosisResponse(BaseModel):
     provider: str
     model: str
     raw_response: str
+
+
+class WorkspaceParticipantResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    user_id: str
+    role: str
+    joined_at: str
+    last_active_at: str
+    presence: dict[str, Any]
+
+
+class CollaborativeWorkspaceCreate(BaseModel):
+    incident_id: str
+    repository_full_name: str
+    base_branch: str
+    head_branch: str
+    head_sha: str
+
+
+class CollaborativeWorkspaceResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    incident_id: str
+    workspace_id: str
+    repository_full_name: str
+    base_branch: str
+    head_branch: str
+    head_sha: str
+    owner_id: str
+    participants: list[WorkspaceParticipantResponse]
+    status: str
+    created_at: str
+    updated_at: str
+    last_synced_at: str | None = None
+
+
+class WorkspaceDocumentResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    workspace_id: str
+    path: str
+    language: str
+    content: str
+    original_content: str
+    version: int
+    last_modified_by: str
+    last_modified_at: str
+    is_binary: bool
+
+
+class DocumentVersionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    workspace_id: str
+    document_id: str
+    version_number: int
+    parent_version_id: str | None = None
+    content_snapshot: str
+    operations: list[dict[str, Any]]
+    author_id: str
+    author_type: str
+    message: str
+    tags: list[str]
+    ci_run_id: str | None = None
+    ci_status: str | None = None
+    ci_url: str | None = None
+    created_at: str
+
+
+class IncidentEventResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    incident_id: str
+    workspace_id: str
+    actor_id: str
+    actor_type: str
+    actor_name: str
+    type: str
+    action: str
+    description: str
+    document_id: str | None = None
+    version_id: str | None = None
+    before: dict[str, Any]
+    after: dict[str, Any]
+    metadata: dict[str, Any]
+    correlation_id: str | None = None
+    causation_id: str | None = None
+    timestamp: str
+
+
+class ValidationStageResultResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    name: str
+    status: str
+    command: str
+    output: str | None = None
+    error: str | None = None
+    started_at: str | None = None
+    completed_at: str | None = None
+
+
+class ValidationRunResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    workspace_id: str
+    version_id: str
+    triggered_by: str
+    status: str
+    stages: list[ValidationStageResultResponse]
+    started_at: str | None = None
+    completed_at: str | None = None
+    logs: list[str]
+    created_at: str
+
+
+class CreateCheckpointRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=500)
+    tags: list[str] = Field(default_factory=list)
+
+
+class RestoreVersionRequest(BaseModel):
+    version_id: str
+
+
+class AuditEventFilter(BaseModel):
+    actor_type: str | None = None
+    event_type: str | None = None
+    actor_id: str | None = None
+    document_id: str | None = None
+    from_timestamp: str | None = None
+    to_timestamp: str | None = None
+    limit: int = Field(default=100, ge=1, le=500)
+
+
+class AuditEventSummary(BaseModel):
+    total_events: int
+    actor_type_breakdown: dict[str, int]
+    event_type_breakdown: dict[str, int]
+    time_range: dict[str, str | None]

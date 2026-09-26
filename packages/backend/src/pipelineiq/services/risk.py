@@ -59,4 +59,3 @@ def assess_risk(signals: RiskSignals, profile: RiskProfile) -> RiskAssessment:
         action = PolicyAction.BLOCK_ONLY
 
     return RiskAssessment(score=score, band=band, action=action, factors=factors)
-

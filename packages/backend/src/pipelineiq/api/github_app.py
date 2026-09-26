@@ -57,16 +57,10 @@ async def owned_workspace_or_404(workspace_id: str, owner_id: str) -> Workspace:
 
 
 @router.get("/{workspace_id}/github/install", response_class=RedirectResponse)
-async def initiate_github_app_installation(
-    request: Request, workspace_id: str
-) -> RedirectResponse:
+async def initiate_github_app_installation(request: Request, workspace_id: str) -> RedirectResponse:
     """Initiate GitHub App installation flow for a workspace."""
     settings = get_settings()
-    if not (
-        settings.GITHUB_APP_ID
-        or settings.GITHUB_APP_SLUG
-        or settings.GITHUB_APP_PRIVATE_KEY
-    ):
+    if not (settings.GITHUB_APP_ID or settings.GITHUB_APP_SLUG or settings.GITHUB_APP_PRIVATE_KEY):
         raise PipelineIQError(
             status_code=503,
             code="GITHUB_APP_NOT_CONFIGURED",
@@ -84,9 +78,7 @@ async def initiate_github_app_installation(
 
 
 @router.delete("/{workspace_id}/github/installation")
-async def disconnect_github_app_installation(
-    request: Request, workspace_id: str
-) -> dict[str, str]:
+async def disconnect_github_app_installation(request: Request, workspace_id: str) -> dict[str, str]:
     """Disconnect GitHub App installation from workspace."""
     settings = get_settings()
     if not settings.GITHUB_APP_ID:
@@ -124,9 +116,12 @@ async def list_webhook_events(
     if not workspace.github_installation_id:
         return []
 
-    events = await WebhookEvent.find(
-        WebhookEvent.installation_id == workspace.github_installation_id
-    ).sort("-received_at").limit(limit).to_list()
+    events = (
+        await WebhookEvent.find(WebhookEvent.installation_id == workspace.github_installation_id)
+        .sort("-received_at")
+        .limit(limit)
+        .to_list()
+    )
 
     return [
         WebhookEventResponse(
@@ -155,11 +150,7 @@ async def github_app_installation_callback(
 ) -> RedirectResponse:
     """Handle GitHub App installation callback."""
     settings = get_settings()
-    if not (
-        settings.GITHUB_APP_ID
-        or settings.GITHUB_APP_SLUG
-        or settings.GITHUB_APP_PRIVATE_KEY
-    ):
+    if not (settings.GITHUB_APP_ID or settings.GITHUB_APP_SLUG or settings.GITHUB_APP_PRIVATE_KEY):
         error_url = f"{settings.FRONTEND_URL}/?installation=github_not_configured"
         return RedirectResponse(error_url, status_code=302)
 

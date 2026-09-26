@@ -127,7 +127,9 @@ async def run_diagnosis(
     gateway = get_llm_gateway(settings)
 
     # Get error logs from monitor stage
-    error_logs = "\n".join(pipeline_run.monitor_logs_excerpt) if pipeline_run.monitor_logs_excerpt else ""
+    error_logs = (
+        "\n".join(pipeline_run.monitor_logs_excerpt) if pipeline_run.monitor_logs_excerpt else ""
+    )
     if not error_logs and pipeline_run.monitor_summary:
         error_logs = pipeline_run.monitor_summary
 

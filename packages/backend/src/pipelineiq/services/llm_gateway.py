@@ -224,7 +224,10 @@ class CircuitBreaker:
         if self.state == "closed":
             return True
         if self.state == "open":
-            if self.last_failure_time and time.time() - self.last_failure_time > self.recovery_timeout:
+            if (
+                self.last_failure_time
+                and time.time() - self.last_failure_time > self.recovery_timeout
+            ):
                 self.state = "half-open"
                 return True
             return False
@@ -367,7 +370,12 @@ class LLMGateway:
     def _record_usage(self, agent: AgentType, provider: Provider, usage: dict[str, int]) -> None:
         key = f"{agent.value}:{provider.value}"
         if key not in self._usage_stats:
-            self._usage_stats[key] = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0, "requests": 0}
+            self._usage_stats[key] = {
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "total_tokens": 0,
+                "requests": 0,
+            }
         self._usage_stats[key]["prompt_tokens"] += usage.get("prompt_tokens", 0)
         self._usage_stats[key]["completion_tokens"] += usage.get("completion_tokens", 0)
         self._usage_stats[key]["total_tokens"] += usage.get("total_tokens", 0)

@@ -25,4 +25,3 @@ class SecretCipher:
             return self._cipher.decrypt(value.encode()).decode()
         except InvalidToken as exc:
             raise ValueError("Unable to decrypt stored secret") from exc
-

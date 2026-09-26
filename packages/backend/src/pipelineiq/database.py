@@ -54,4 +54,3 @@ def close_database() -> None:
         database_state.client.close()
     database_state.client = None
     database_state.ready = False
-

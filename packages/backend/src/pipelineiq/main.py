@@ -10,7 +10,9 @@ from fastapi.responses import JSONResponse
 from starlette.responses import Response
 
 from pipelineiq import __version__
+from pipelineiq.api.audit import router as audit_router
 from pipelineiq.api.auth import router as auth_router
+from pipelineiq.api.collaborative import router as collaborative_router
 from pipelineiq.api.github import router as github_router
 from pipelineiq.api.github_app import github_app_callback_router
 from pipelineiq.api.github_app import router as github_app_router
@@ -62,6 +64,8 @@ def create_app() -> FastAPI:
     application.include_router(github_app_callback_router)
     application.include_router(auth_router)
     application.include_router(workspaces_router)
+    application.include_router(collaborative_router)
+    application.include_router(audit_router)
     application.add_exception_handler(PipelineIQError, pipelineiq_error_handler)  # type: ignore[arg-type]
     application.add_exception_handler(RequestValidationError, validation_error_handler)  # type: ignore[arg-type]
 

@@ -70,6 +70,7 @@ async def fetch_file_content(
         result = await client.get_file_content(installation_id, owner, repo, path, ref)
         if result and "content" in result:
             import base64
+
             return base64.b64decode(result["content"]).decode("utf-8")
     except Exception:
         pass
@@ -271,7 +272,9 @@ async def apply_fix_files(
 
         # Create commit
         commit_result = await client.create_commit(
-            installation_id, owner, repo,
+            installation_id,
+            owner,
+            repo,
             f"PipelineIQ auto-fix: {files[0]['path'] if files else 'fix'}",
             tree_sha,
             [base_sha],

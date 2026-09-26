@@ -246,8 +246,7 @@ class PipelineRuntime:
             "band": assessment.band.value,
             "action": assessment.action.value,
             "factors": [
-                {"name": f.name, "points": f.points, "reason": f.reason}
-                for f in assessment.factors
+                {"name": f.name, "points": f.points, "reason": f.reason} for f in assessment.factors
             ],
         }
         pipeline_run.risk_inputs_json = signals
