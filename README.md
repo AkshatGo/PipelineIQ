@@ -7,6 +7,8 @@ repository now contains the initial working monorepo alongside the original plan
 
 - FastAPI service with health/readiness endpoints and structured error handling
 - Deterministic, explainable risk-scoring and policy endpoint
+- Verified GitHub webhook signatures with delivery idempotency and event normalization
+- MongoDB persistence for all eight planned collections and their indexes
 - React + TypeScript dashboard preview using TanStack Query
 - Shared TypeScript and Python contracts
 - MongoDB and optional Kafka local infrastructure
@@ -23,6 +25,10 @@ make dev
 
 The dashboard runs at `http://localhost:5173`, the API at `http://localhost:8000`, and interactive
 API documentation at `http://localhost:8000/docs`.
+
+GitHub webhooks are accepted at `POST /api/github/webhooks` after setting
+`GITHUB_APP_WEBHOOK_SECRET`. Completed workflow runs are normalized and stored once per
+`X-GitHub-Delivery` value.
 
 ### Working API slice
 

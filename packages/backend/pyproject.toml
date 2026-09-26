@@ -16,6 +16,8 @@ dependencies = [
   "beanie>=1.29,<2",
   "structlog>=24,<26",
   "httpx>=0.28,<0.29",
+  "aiokafka>=0.10,<1",
+  "python-jose[cryptography]>=3.4,<4",
 ]
 
 [project.optional-dependencies]
@@ -34,6 +36,7 @@ packages = ["src/pipelineiq"]
 testpaths = ["tests"]
 addopts = "--strict-markers --cov=pipelineiq --cov-report=term-missing --cov-fail-under=80"
 asyncio_mode = "auto"
+markers = ["integration: requires local infrastructure such as MongoDB"]
 
 [tool.ruff]
 target-version = "py311"

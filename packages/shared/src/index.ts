@@ -55,6 +55,22 @@ export interface HealthResponse {
   environment: string;
 }
 
+export interface GitHubWebhookReceipt {
+  received: boolean;
+  event_type: string;
+  delivery_id: string;
+  ignored?: string;
+  duplicate: boolean;
+  workspace_id?: string;
+  repo?: string;
+  run_id?: number;
+  conclusion?: string;
+  branch?: string;
+  commit_sha?: string;
+  triggered_by?: string;
+  kafka_topic?: string;
+}
+
 export interface WorkspaceResponse {
   id: string;
   name: string;
@@ -66,4 +82,3 @@ export interface WorkspaceResponse {
   created_at: string;
   updated_at: string;
 }
-

@@ -26,7 +26,9 @@ class Settings(BaseSettings):
 
     MONGODB_URI: str = "mongodb://localhost:27017"
     MONGODB_DB_NAME: str = "pipelineiq"
+    DATABASE_CONNECT_ON_STARTUP: bool = True
     DATABASE_REQUIRED_AT_STARTUP: bool = False
+    DATABASE_CONNECT_TIMEOUT_MS: int = Field(default=2000, ge=250, le=30000)
 
     JWT_SECRET: str = Field(default="development-only-change-me-32-chars", min_length=32)
     JWT_ALGORITHM: str = "HS256"
@@ -39,6 +41,7 @@ class Settings(BaseSettings):
     GITHUB_APP_SLUG: str | None = None
     GITHUB_APP_PRIVATE_KEY: str | None = None
     GITHUB_APP_WEBHOOK_SECRET: str | None = None
+    GITHUB_WEBHOOK_MAX_BYTES: int = Field(default=10_000_000, ge=1024)
 
     KAFKA_ENABLED: bool = False
     KAFKA_BOOTSTRAP_SERVERS: str = "localhost:9092"
@@ -53,4 +56,3 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-
