@@ -1,0 +1,53 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pipelineiq-backend"
+version = "0.1.0"
+description = "PipelineIQ API and pipeline orchestration service"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115,<0.116",
+  "uvicorn[standard]>=0.34,<1",
+  "pydantic>=2.10,<3",
+  "pydantic-settings>=2.8,<3",
+  "motor>=3.6,<4",
+  "beanie>=1.29,<2",
+  "structlog>=24,<26",
+  "httpx>=0.28,<0.29",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8,<9",
+  "pytest-asyncio>=0.24,<1",
+  "pytest-cov>=6,<8",
+  "ruff>=0.11,<1",
+  "mypy>=1.15,<2",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pipelineiq"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--strict-markers --cov=pipelineiq --cov-report=term-missing --cov-fail-under=80"
+asyncio_mode = "auto"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "C4", "ANN", "ARG", "PTH", "SIM", "RET"]
+ignore = ["ANN401", "ARG001", "S101"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["beanie.*", "motor.*"]
+ignore_missing_imports = true

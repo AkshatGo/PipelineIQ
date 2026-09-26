@@ -1,0 +1,13 @@
+{
+  "name": "@pipelineiq/backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": ".venv/bin/uvicorn pipelineiq.main:app --reload --port 8000",
+    "build": ".venv/bin/python -m compileall -q src",
+    "test": ".venv/bin/pytest",
+    "lint": ".venv/bin/ruff check src tests",
+    "typecheck": ".venv/bin/mypy src"
+  }
+}
+
