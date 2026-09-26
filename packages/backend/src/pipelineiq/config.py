@@ -76,6 +76,15 @@ class Settings(BaseSettings):
     def is_production(self) -> bool:
         return self.APP_ENV == "production"
 
+    @property
+    def github_app_install_url(self) -> str:
+        return f"https://github.com/apps/{self.GITHUB_APP_SLUG}/installations/new"
+
+    @property
+    def github_app_private_key_pem(self) -> str:
+        key = self.GITHUB_APP_PRIVATE_KEY
+        return key.replace("\\n", "\n") if key else ""
+
 
 @lru_cache
 def get_settings() -> Settings:

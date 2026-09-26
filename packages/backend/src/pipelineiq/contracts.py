@@ -70,3 +70,71 @@ class ReadinessResponse(BaseModel):
     status: str
     checks: dict[str, str]
 
+
+class WorkspaceCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+    description: str | None = Field(default=None, max_length=500)
+    risk_profile: RiskProfile = Field(default_factory=RiskProfile)
+
+
+class WorkspaceUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=100)
+    description: str | None = Field(default=None, max_length=500)
+    risk_profile: RiskProfile | None = None
+    slack_devops_mention: str | None = Field(default=None, max_length=100)
+
+
+class WorkspaceResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    name: str
+    description: str | None = None
+    owner_id: str
+    github_installation_id: int | None = None
+    github_repository_id: int | None = None
+    github_repo_full_name: str | None = None
+    github_default_branch: str | None = None
+    github_repo_private: bool | None = None
+    github_repo_html_url: str | None = None
+    github_account_login: str | None = None
+    github_account_type: str | None = None
+    slack_devops_mention: str | None = None
+    risk_profile: RiskProfile
+    connected_at: str | None = None
+    last_webhook_event_at: str | None = None
+    created_at: str
+    updated_at: str
+    connected: bool
+
+
+class RepositoryCreate(BaseModel):
+    github_repo_id: int = Field(gt=0)
+    full_name: str = Field(min_length=3, max_length=255)
+    name: str = Field(min_length=1, max_length=100)
+    private: bool = False
+    html_url: str
+    default_branch: str = Field(default="main", min_length=1, max_length=255)
+
+
+class RepositoryResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    github_repo_id: int
+    full_name: str
+    name: str
+    private: bool
+    html_url: str
+    default_branch: str
+    workspace_id: str
+    connected_at: str
+    connected_by: str
+
+
+class WebhookEventResponse(BaseModel):
+    delivery_id: str
+    event_type: str
+    action: str | None = None
+    repository_full_name: str | None = None
+    received_at: str

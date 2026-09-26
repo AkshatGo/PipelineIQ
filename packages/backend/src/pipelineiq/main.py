@@ -12,8 +12,11 @@ from starlette.responses import Response
 from pipelineiq import __version__
 from pipelineiq.api.auth import router as auth_router
 from pipelineiq.api.github import router as github_router
+from pipelineiq.api.github_app import github_app_callback_router
+from pipelineiq.api.github_app import router as github_app_router
 from pipelineiq.api.health import router as health_router
 from pipelineiq.api.risk import router as risk_router
+from pipelineiq.api.workspaces import router as workspaces_router
 from pipelineiq.config import get_settings
 from pipelineiq.database import close_database, connect_database
 from pipelineiq.errors import (
@@ -55,7 +58,10 @@ def create_app() -> FastAPI:
     application.include_router(health_router)
     application.include_router(risk_router, prefix=settings.API_PREFIX)
     application.include_router(github_router)
+    application.include_router(github_app_router, prefix=settings.API_PREFIX)
+    application.include_router(github_app_callback_router)
     application.include_router(auth_router)
+    application.include_router(workspaces_router)
     application.add_exception_handler(PipelineIQError, pipelineiq_error_handler)  # type: ignore[arg-type]
     application.add_exception_handler(RequestValidationError, validation_error_handler)  # type: ignore[arg-type]
 
