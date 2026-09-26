@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import uuid
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
@@ -13,6 +14,8 @@ import structlog
 
 from pipelineiq.config import Settings
 from pipelineiq.models import PipelineRun
+from pipelineiq.services.autofix_service import generate_autofix
+from pipelineiq.services.diagnosis import apply_diagnosis_to_pipeline_run, run_diagnosis
 from pipelineiq.services.error_detection import detect_failure
 from pipelineiq.services.github_app import GitHubAppClient
 from pipelineiq.services.risk import assess_risk
@@ -200,17 +203,12 @@ class PipelineRuntime:
     async def _run_diagnosis(
         self,
         pipeline_run: PipelineRun,
-        _settings: Settings,
-        _client: GitHubAppClient,
+        settings: Settings,
+        client: GitHubAppClient,
     ) -> None:
         """Diagnosis stage: analyze failure with LLM."""
-        # TODO: Implement LLM-based diagnosis
-        # For now, just mark as completed with a placeholder
-        pipeline_run.diagnosis_status = "completed"
-        pipeline_run.diagnosis_report = "Diagnosis not yet implemented"
-        pipeline_run.diagnosis_report_json = {"status": "not_implemented"}
-        pipeline_run.diagnosis_provider = "placeholder"
-        pipeline_run.diagnosis_model = "placeholder"
+        result = await run_diagnosis(pipeline_run, settings, client)
+        apply_diagnosis_to_pipeline_run(pipeline_run, result)
 
     async def _run_risk(
         self,
@@ -262,12 +260,24 @@ class PipelineRuntime:
     async def _run_autofix(
         self,
         pipeline_run: PipelineRun,
-        _settings: Settings,
-        _client: GitHubAppClient,
+        settings: Settings,
+        client: GitHubAppClient,
     ) -> None:
         """Auto-fix stage: generate fix and create PR if needed."""
-        # TODO: Implement auto-fix logic
-        # For now, just mark as completed with policy action
+        result = await generate_autofix(pipeline_run, settings, client)
+
+        if result.files:
+            # Store the proposed fix
+            pipeline_run.autofix_report_json = {
+                "summary": result.summary,
+                "files": result.files,
+                "provider": result.provider,
+                "model": result.model,
+            }
+            pipeline_run.autofix_execution_id = str(uuid.uuid4())
+        else:
+            pipeline_run.autofix_report_json = {"summary": result.summary, "files": []}
+
         if pipeline_run.autofix_mode == "auto_fix":
             pipeline_run.autofix_status = "completed"
             pipeline_run.autofix_mode = "auto_fix"
