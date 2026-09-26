@@ -7,7 +7,11 @@ import pytest
 from pipelineiq.config import Settings
 from pipelineiq.database import close_database, connect_database, database_state
 from pipelineiq.models import PipelineRun, User, WebhookEvent, Workspace
-from pipelineiq.services.github_webhooks import GitHubWebhookPayload, MongoWebhookStore, WebhookIntake
+from pipelineiq.services.github_webhooks import (
+    GitHubWebhookPayload,
+    MongoWebhookStore,
+    WebhookIntake,
+)
 
 pytestmark = [
     pytest.mark.integration,
@@ -78,10 +82,11 @@ async def test_webhook_delivery_is_persisted_once() -> None:
         assert second.duplicate
         assert await WebhookEvent.count() == 1
         assert await PipelineRun.count() == 1
-        persisted_run = await PipelineRun.find_one(PipelineRun.delivery_id == "integration-delivery")
+        persisted_run = await PipelineRun.find_one(
+            PipelineRun.delivery_id == "integration-delivery"
+        )
         assert persisted_run is not None
         assert persisted_run.health_status == "failed"
     finally:
         await database_state.client.drop_database(database_name)
         close_database()
-

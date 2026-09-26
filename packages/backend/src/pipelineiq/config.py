@@ -2,7 +2,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 ROOT_DIR = Path(__file__).resolve().parents[4]
@@ -33,10 +33,19 @@ class Settings(BaseSettings):
     JWT_SECRET: str = Field(default="development-only-change-me-32-chars", min_length=32)
     JWT_ALGORITHM: str = "HS256"
     SESSION_EXPIRY_DAYS: int = Field(default=15, ge=1, le=90)
+    SESSION_COOKIE_NAME: str = "piq_session"
+    OAUTH_STATE_COOKIE_NAME: str = "piq_oauth_state"
+    COOKIE_SECURE: bool = False
+    COOKIE_DOMAIN: str | None = None
+    ENCRYPTION_KEY: str | None = None
 
     GITHUB_CLIENT_ID: str | None = None
     GITHUB_CLIENT_SECRET: str | None = None
     GITHUB_REDIRECT_URI: str = "http://localhost:8000/api/auth/github/callback"
+    GITHUB_OAUTH_SCOPES: str = "read:user read:org"
+    GITHUB_AUTHORIZE_URL: str = "https://github.com/login/oauth/authorize"
+    GITHUB_TOKEN_URL: str = "https://github.com/login/oauth/access_token"
+    GITHUB_API_URL: str = "https://api.github.com"
     GITHUB_APP_ID: str | None = None
     GITHUB_APP_SLUG: str | None = None
     GITHUB_APP_PRIVATE_KEY: str | None = None
@@ -47,6 +56,21 @@ class Settings(BaseSettings):
     KAFKA_BOOTSTRAP_SERVERS: str = "localhost:9092"
     SLACK_ENABLED: bool = False
     SLACK_WEBHOOK_URL: str | None = None
+
+    @model_validator(mode="after")
+    def enforce_production_security(self) -> "Settings":
+        if self.APP_ENV != "production":
+            return self
+        missing: list[str] = []
+        if self.JWT_SECRET == "development-only-change-me-32-chars":
+            missing.append("JWT_SECRET")
+        if not self.ENCRYPTION_KEY:
+            missing.append("ENCRYPTION_KEY")
+        if not self.COOKIE_SECURE:
+            missing.append("COOKIE_SECURE=true")
+        if missing:
+            raise ValueError(f"Production security settings are missing: {', '.join(missing)}")
+        return self
 
     @property
     def is_production(self) -> bool:

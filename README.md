@@ -6,6 +6,7 @@ repository now contains the initial working monorepo alongside the original plan
 ## Current implementation
 
 - FastAPI service with health/readiness endpoints and structured error handling
+- GitHub OAuth with signed state, encrypted provider tokens, and HttpOnly cookie sessions
 - Deterministic, explainable risk-scoring and policy endpoint
 - Verified GitHub webhook signatures with delivery idempotency and event normalization
 - MongoDB persistence for all eight planned collections and their indexes

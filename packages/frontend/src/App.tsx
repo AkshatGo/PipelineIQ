@@ -1,8 +1,9 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type { RiskAssessmentRequest } from "@pipelineiq/shared";
 import { FormEvent, useState } from "react";
 
 import { assessRisk } from "./api/risk";
+import { getCurrentUser, githubLoginUrl } from "./api/auth";
 
 const initialRequest: RiskAssessmentRequest = {
   signals: {
@@ -19,6 +20,7 @@ const initialRequest: RiskAssessmentRequest = {
 export function App() {
   const [request, setRequest] = useState(initialRequest);
   const risk = useMutation({ mutationFn: assessRisk });
+  const session = useQuery({ queryKey: ["current-user"], queryFn: getCurrentUser, retry: false });
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -35,7 +37,14 @@ export function App() {
   return (
     <main>
       <header className="hero">
-        <div className="brand"><span className="brand-mark">PI</span> PipelineIQ</div>
+        <div className="topbar">
+          <div className="brand"><span className="brand-mark">PI</span> PipelineIQ</div>
+          {session.data ? (
+            <span className="session">Signed in as <strong>{session.data.username}</strong></span>
+          ) : (
+            <a className="login-link" href={githubLoginUrl}>Sign in with GitHub</a>
+          )}
+        </div>
         <p className="eyebrow">CI/CD failure intelligence</p>
         <h1>Turn pipeline failures into safe, explainable action.</h1>
         <p className="lede">
@@ -107,4 +116,3 @@ export function App() {
     </main>
   );
 }
-

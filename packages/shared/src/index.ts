@@ -71,6 +71,26 @@ export interface GitHubWebhookReceipt {
   kafka_topic?: string;
 }
 
+export interface GitHubOrganization {
+  id: number;
+  login: string;
+  avatar_url?: string;
+  description?: string;
+  url?: string;
+}
+
+export interface UserResponse {
+  id: string;
+  github_id: number;
+  username: string;
+  display_name?: string;
+  email?: string;
+  avatar_url?: string;
+  organizations: GitHubOrganization[];
+  last_login: string;
+  created_at: string;
+}
+
 export interface WorkspaceResponse {
   id: string;
   name: string;
