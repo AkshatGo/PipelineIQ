@@ -1,4 +1,5 @@
 from enum import StrEnum
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -138,3 +139,159 @@ class WebhookEventResponse(BaseModel):
     action: str | None = None
     repository_full_name: str | None = None
     received_at: str
+
+
+class PipelineRunResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    workspace_id: str
+    installation_id: int | None = None
+    repository_full_name: str
+    delivery_id: str
+    event_type: str
+    action: str | None = None
+    run_id: int | None = None
+    workflow_status: str | None = None
+    workflow_name: str | None = None
+    workflow_url: str | None = None
+    branch: str | None = None
+    commit_sha: str | None = None
+    triggered_by: str | None = None
+    conclusion: str | None = None
+    health_status: str
+    monitor_status: str
+    diagnosis_status: str
+    risk_status: str
+    monitor_summary: str | None = None
+    monitor_report_json: dict[str, Any]
+    monitor_logs_excerpt: list[str]
+    diagnosis_report: str | None = None
+    diagnosis_report_json: dict[str, Any]
+    diagnosis_error: str | None = None
+    risk_score: int | None = None
+    risk_band: str | None = None
+    risk_report_json: dict[str, Any]
+    risk_inputs_json: dict[str, Any]
+    risk_error: str | None = None
+    risk_provider: str | None = None
+    risk_model: str | None = None
+    autofix_status: str
+    autofix_mode: str | None = None
+    autofix_report_url: str | None = None
+    autofix_pr_url: str | None = None
+    autofix_execution_id: str | None = None
+    autofix_error: str | None = None
+    autofix_feedback_url: str | None = None
+    autofix_feedback_status: str | None = None
+    error_summary: str | None = None
+    diagnosis_provider: str | None = None
+    diagnosis_model: str | None = None
+    monitor_provider: str | None = None
+    monitor_model: str | None = None
+    raw_event: dict[str, Any]
+    enriched_event: dict[str, Any]
+    created_at: str
+    updated_at: str
+
+
+class AutoFixExecutionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    workspace_id: str
+    pipeline_run_id: str
+    repository_full_name: str
+    target_branch: str
+    error_signature: str
+    risk_score: int
+    policy_action: str
+    execution_status: str
+    reviewer_username: str | None = None
+    reviewer_github_id: int | None = None
+    mode: str
+    proposed_fix_json: dict[str, Any]
+    report_json: dict[str, Any]
+    pr_number: int | None = None
+    pr_url: str | None = None
+    pr_state: str | None = None
+    fix_branch: str | None = None
+    merge_sha: str | None = None
+    loop_blocked_reason: str | None = None
+    signed_report_token: str | None = None
+    report_feedback_status: str | None = None
+    report_feedback_note: str | None = None
+    resolution_feedback_status: str | None = None
+    resolution_feedback_url: str | None = None
+    resolution_feedback_requested_at: str | None = None
+    resolution_feedback_submitted_at: str | None = None
+    created_at: str
+    updated_at: str
+
+
+class AutoFixFeedbackResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    workspace_id: str
+    execution_id: str
+    pipeline_run_id: str
+    repository_full_name: str
+    error_signature: str
+    target_branch: str
+    reviewer_username: str | None = None
+    reviewer_github_id: int | None = None
+    feedback_token: str
+    feedback_url: str
+    status: str
+    outcome: str | None = None
+    automation_quality: str | None = None
+    should_auto_apply_similar: bool | None = None
+    notes: str | None = None
+    requested_at: str
+    submitted_at: str | None = None
+    created_at: str
+    updated_at: str
+
+
+class AutoFixMemoryResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    workspace_id: str
+    repository_full_name: str
+    error_signature: str
+    memory_type: str
+    reviewer_username: str | None = None
+    reviewer_github_id: int | None = None
+    note: str | None = None
+    approved_for_auto_merge: bool
+    created_at: str
+    updated_at: str
+
+
+class AutoFixReportResponse(BaseModel):
+    execution: AutoFixExecutionResponse
+    pipeline_run: PipelineRunResponse
+
+
+class AutoFixReportDecisionRequest(BaseModel):
+    decision: str = Field(pattern="^(approve|reject)$")
+    note: str | None = Field(default=None, max_length=500)
+
+
+class AutoFixFeedbackRequest(BaseModel):
+    outcome: str = Field(pattern="^(resolved|partially_resolved|not_resolved)$")
+    automation_quality: str = Field(pattern="^(excellent|acceptable|poor)$")
+    should_auto_apply_similar: bool
+    notes: str | None = Field(default=None, max_length=1000)
+
+
+class DiagnosisResponse(BaseModel):
+    error_type: str
+    possible_causes: list[str]
+    latest_working_change: str
+    suggested_fixes: list[str]
+    provider: str
+    model: str
+    raw_response: str
