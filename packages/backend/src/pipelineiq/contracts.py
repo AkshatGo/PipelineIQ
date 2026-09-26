@@ -1,4 +1,4 @@
-from enum import StrEnum
+from enum import Enum, StrEnum
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -441,3 +441,67 @@ class AuditEventSummary(BaseModel):
     actor_type_breakdown: dict[str, int]
     event_type_breakdown: dict[str, int]
     time_range: dict[str, str | None]
+
+
+class AIPermissionLevel(str, Enum):
+    SUGGESTION_ONLY = "suggestion_only"
+    APPLY_WITH_APPROVAL = "apply_with_approval"
+    AUTO_APPLY_SAFE = "auto_apply_safe"
+    RESTRICTED_AUTOMATION = "restricted_automation"
+
+
+class AICapability(str, Enum):
+    ANALYZE_LOGS = "analyze_logs"
+    FETCH_DIFF = "fetch_diff"
+    GENERATE_DIAGNOSIS = "generate_diagnosis"
+    GENERATE_FIX = "generate_fix"
+    CREATE_PR = "create_pr"
+    REQUEST_REVIEW = "request_review"
+    MERGE_PR = "merge_pr"
+    RUN_TESTS = "run_tests"
+    READ_FILE = "read_file"
+    WRITE_FILE = "write_file"
+    DELETE_FILE = "delete_file"
+
+
+class ConstraintType(str, Enum):
+    FILE_PATTERN = "file_pattern"
+    OPERATION = "operation"
+    BRANCH = "branch"
+    REQUIRES_APPROVAL = "requires_approval"
+    SAFE_CHANGE = "safe_change"
+
+
+class AIConstraint(BaseModel):
+    type: ConstraintType
+    pattern: str | None = None
+    operations: list[AICapability] | None = None
+    branches: list[str] | None = None
+    reason: str
+    severity: str = "error"
+
+
+class AgentConfig(BaseModel):
+    agent_type: str
+    name: str
+    permission: AIPermissionLevel = AIPermissionLevel.SUGGESTION_ONLY
+    capabilities: list[AICapability] = Field(default_factory=list)
+    constraints: list[AIConstraint] = Field(default_factory=list)
+    fallback_provider: str | None = None
+    max_tokens: int = 8000
+    temperature: float = 0.1
+
+
+class SafetyCheckResult(BaseModel):
+    allowed: bool
+    reason: str | None = None
+    requires_approval: bool = False
+    matched_constraints: list[AIConstraint] = Field(default_factory=list)
+    safe_change: bool = False
+
+
+class SafetyCheckRequest(BaseModel):
+    agent_type: str
+    operation: AICapability
+    file_path: str | None = None
+    branch: str | None = None

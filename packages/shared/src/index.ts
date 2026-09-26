@@ -455,3 +455,55 @@ export interface AuditEventSummary {
     latest?: string;
   };
 }
+
+export type AIPermissionLevel = "suggestion_only" | "apply_with_approval" | "auto_apply_safe" | "restricted_automation";
+
+export type AICapability = 
+  | "analyze_logs" 
+  | "fetch_diff" 
+  | "generate_diagnosis" 
+  | "generate_fix" 
+  | "create_pr" 
+  | "request_review" 
+  | "merge_pr" 
+  | "run_tests" 
+  | "read_file" 
+  | "write_file" 
+  | "delete_file";
+
+export type ConstraintType = "file_pattern" | "operation" | "branch" | "requires_approval" | "safe_change";
+
+export interface AIConstraint {
+  type: ConstraintType;
+  pattern?: string;
+  operations?: AICapability[];
+  branches?: string[];
+  reason: string;
+  severity?: string;
+}
+
+export interface AgentConfig {
+  agent_type: string;
+  name: string;
+  permission: AIPermissionLevel;
+  capabilities: AICapability[];
+  constraints: AIConstraint[];
+  fallback_provider?: string;
+  max_tokens?: number;
+  temperature?: number;
+}
+
+export interface SafetyCheckResult {
+  allowed: boolean;
+  reason?: string;
+  requires_approval: boolean;
+  matched_constraints: AIConstraint[];
+  safe_change: boolean;
+}
+
+export interface SafetyCheckRequest {
+  agent_type: string;
+  operation: AICapability;
+  file_path?: string;
+  branch?: string;
+}
