@@ -57,6 +57,35 @@ class Settings(BaseSettings):
     SLACK_ENABLED: bool = False
     SLACK_WEBHOOK_URL: str | None = None
 
+    # LLM Provider settings
+    OPENAI_API_KEY: str | None = None
+    OPENAI_API_BASE_URL: str = "https://api.openai.com/v1"
+    GROQ_API_KEY: str | None = None
+    GROQ_API_BASE_URL: str = "https://api.groq.com/openai/v1"
+    GITHUB_TOKEN: str | None = None
+    GITHUB_MODELS_API_BASE_URL: str = "https://models.github.ai/inference"
+
+    # Agent provider configuration
+    MONITOR_AGENT_PRIMARY_PROVIDER: str = "github_models"
+    MONITOR_AGENT_PRIMARY_MODEL: str = "gpt-4o-mini"
+    MONITOR_AGENT_FALLBACK_PROVIDER: str = "groq"
+    MONITOR_AGENT_FALLBACK_MODEL: str = "llama-3.3-70b-versatile"
+
+    DIAGNOSIS_AGENT_PRIMARY_PROVIDER: str = "groq"
+    DIAGNOSIS_AGENT_PRIMARY_MODEL: str = "llama-3.3-70b-versatile"
+    DIAGNOSIS_AGENT_FALLBACK_PROVIDER: str = "github_models"
+    DIAGNOSIS_AGENT_FALLBACK_MODEL: str = "gpt-4o-mini"
+
+    RISK_AGENT_PRIMARY_PROVIDER: str = "github_models"
+    RISK_AGENT_PRIMARY_MODEL: str = "gpt-4o-mini"
+    RISK_AGENT_FALLBACK_PROVIDER: str = "groq"
+    RISK_AGENT_FALLBACK_MODEL: str = "llama-3.3-70b-versatile"
+
+    AUTOFIX_AGENT_PRIMARY_PROVIDER: str = "github_models"
+    AUTOFIX_AGENT_PRIMARY_MODEL: str = "gpt-4o-mini"
+    AUTOFIX_AGENT_FALLBACK_PROVIDER: str = "groq"
+    AUTOFIX_AGENT_FALLBACK_MODEL: str = "llama-3.3-70b-versatile"
+
     @model_validator(mode="after")
     def enforce_production_security(self) -> "Settings":
         if self.APP_ENV != "production":

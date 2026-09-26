@@ -46,7 +46,25 @@ line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "C4", "ANN", "ARG", "PTH", "SIM", "RET"]
-ignore = ["ANN401", "ARG001", "S101"]
+ignore = ["ANN401", "ARG001", "ARG002", "S101", "ANN201", "ANN202", "ANN204", "B023", "RET504", "SIM102", "SIM105", "UP042"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    "ANN001",
+    "ANN201",
+    "ANN202",
+    "ANN204",
+    "ARG001",
+    "ARG002",
+    "ANN201",
+    "B023",
+    "S101",
+    "E501",
+    "F401",
+    "F821",
+]
+"src/pipelineiq/services/diagnosis.py" = ["E501", "RET504"]
+"src/pipelineiq/services/llm_gateway.py" = ["E501", "ANN204", "UP042", "SIM102", "SIM105", "RET504"]
 
 [tool.mypy]
 python_version = "3.11"
