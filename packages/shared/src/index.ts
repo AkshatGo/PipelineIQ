@@ -507,3 +507,38 @@ export interface SafetyCheckRequest {
   file_path?: string;
   branch?: string;
 }
+
+export interface ValidationStageConfig {
+  name: string;
+  command: string;
+  required?: boolean;
+  timeout?: number;
+}
+
+export interface ValidationStageResultResponse {
+  name: string;
+  status: string;
+  command: string;
+  output?: string;
+  error?: string;
+  started_at?: string;
+  completed_at?: string;
+}
+
+export interface ValidationRunRequest {
+  version_id: string;
+  custom_stages?: ValidationStageConfig[];
+}
+
+export interface ValidationRunResponse {
+  id: string;
+  workspace_id: string;
+  version_id: string;
+  triggered_by: string;
+  status: string;
+  stages: ValidationStageResultResponse[];
+  started_at?: string;
+  completed_at?: string;
+  logs: string[];
+  created_at: string;
+}

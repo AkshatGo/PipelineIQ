@@ -8,8 +8,8 @@ from datetime import UTC, datetime
 from typing import Any
 
 from pipelineiq.config import Settings
+from pipelineiq.github.github_app_client import GitHubAppClient, GitHubAppError
 from pipelineiq.models import AutoFixExecution, AutoFixMemory, PipelineRun
-from pipelineiq.services.github_app import GitHubAppClient, GitHubAppError
 from pipelineiq.services.llm_gateway import AgentType, get_llm_gateway
 
 AUTOFIX_SYSTEM_PROMPT = (

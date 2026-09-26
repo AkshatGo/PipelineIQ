@@ -505,3 +505,15 @@ class SafetyCheckRequest(BaseModel):
     operation: AICapability
     file_path: str | None = None
     branch: str | None = None
+
+
+class ValidationStageConfig(BaseModel):
+    name: str
+    command: str
+    required: bool = True
+    timeout: int = 60000
+
+
+class ValidationRunRequest(BaseModel):
+    version_id: str
+    custom_stages: list[ValidationStageConfig] | None = None

@@ -8,12 +8,9 @@ from pipelineiq.config import get_settings
 from pipelineiq.contracts import WebhookEventResponse
 from pipelineiq.database import database_state
 from pipelineiq.errors import PipelineIQError
+from pipelineiq.github.github_app_client import GitHubAppError, parse_installation_state
+from pipelineiq.github.github_app_installation import GitHubAppInstallation
 from pipelineiq.models import WebhookEvent, Workspace
-from pipelineiq.services.github_app import (
-    GitHubAppError,
-    GitHubAppInstallation,
-    parse_installation_state,
-)
 from pipelineiq.services.workspaces import find_owned_workspace
 
 router = APIRouter(prefix="/api/workspaces", tags=["github-app"])

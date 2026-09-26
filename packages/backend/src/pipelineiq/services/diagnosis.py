@@ -7,8 +7,8 @@ from dataclasses import dataclass
 from typing import Any
 
 from pipelineiq.config import Settings
+from pipelineiq.github.github_app_client import GitHubAppClient
 from pipelineiq.models import PipelineRun
-from pipelineiq.services.github_app import GitHubAppClient
 from pipelineiq.services.llm_gateway import AgentType, get_llm_gateway
 
 DIAGNOSIS_SYSTEM_PROMPT = """You are an expert CI/CD failure analyst. Analyze the provided workflow failure logs and git diff to determine:

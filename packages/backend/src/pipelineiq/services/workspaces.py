@@ -11,6 +11,7 @@ from pipelineiq.contracts import (
     RepositoryResponse,
     WorkspaceResponse,
 )
+from pipelineiq.github.github_app_client import GitHubAppClient
 from pipelineiq.models import (
     CollaborativeWorkspace,
     DocumentVersion,
@@ -22,7 +23,6 @@ from pipelineiq.models import (
     WorkspaceDocument,
     utc_now,
 )
-from pipelineiq.services.github_app import GitHubAppClient
 
 # Legacy workspace functions (for backward compatibility)
 

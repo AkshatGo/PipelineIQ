@@ -20,6 +20,7 @@ from pipelineiq.contracts import (
 )
 from pipelineiq.database import database_state
 from pipelineiq.errors import PipelineIQError
+from pipelineiq.github.github_app_client import GitHubAppClient
 from pipelineiq.models import (
     CollaborativeWorkspace,
     DocumentVersion,
@@ -29,7 +30,6 @@ from pipelineiq.models import (
     Workspace,
     WorkspaceDocument,
 )
-from pipelineiq.services.github_app import GitHubAppClient
 from pipelineiq.services.workspaces import (
     create_collaborative_workspace,
     create_document_version,

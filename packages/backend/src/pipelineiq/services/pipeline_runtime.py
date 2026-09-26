@@ -13,11 +13,11 @@ from typing import Any
 import structlog
 
 from pipelineiq.config import Settings
+from pipelineiq.github.github_app_client import GitHubAppClient
 from pipelineiq.models import PipelineRun
 from pipelineiq.services.autofix_service import generate_autofix
 from pipelineiq.services.diagnosis import apply_diagnosis_to_pipeline_run, run_diagnosis
 from pipelineiq.services.error_detection import detect_failure
-from pipelineiq.services.github_app import GitHubAppClient
 from pipelineiq.services.risk import assess_risk
 
 logger = structlog.get_logger()
