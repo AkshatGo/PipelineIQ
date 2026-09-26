@@ -1,0 +1,65 @@
+/* @import url() FONT IMPORTS MUST ALWAYS BE AT THE VERY TOP OF THIS FILE, ABOVE THE TAILWIND IMPORTS — DO NOT DELETE THIS COMMENT */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+/* CRITICAL: THE FOLLOWING TAILWIND IMPORTS MUST NEVER BE DELETED OR REORDERED — DO NOT DELETE THIS COMMENT */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* END TAILWIND IMPORTS — ALL OTHER CSS MUST GO BELOW THIS LINE */
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 72px;
+  background-color: #12140f;
+}
+body {
+  background-color: #12140f;
+  color: #ede6d6;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+:focus-visible {
+  outline: 2px solid #9c7a3c;
+  outline-offset: 2px;
+}
+::selection {
+  background: #9c7a3c;
+  color: #12140f;
+}
+/* Brass range sliders for the risk lab */
+.bench-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(to right, #9c7a3c var(--fill), #33362a var(--fill));
+  cursor: pointer;
+}
+.bench-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background: #9c7a3c;
+  border: 3px solid #12140f;
+  box-shadow: 0 0 0 1px #9c7a3c;
+  transition: transform 120ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.bench-range:active::-webkit-slider-thumb {
+  transform: scale(1.15);
+}
+.bench-range::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: #9c7a3c;
+  border: 3px solid #12140f;
+  box-shadow: 0 0 0 1px #9c7a3c;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

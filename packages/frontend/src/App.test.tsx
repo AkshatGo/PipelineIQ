@@ -17,11 +17,11 @@ describe("App", () => {
       </QueryClientProvider>,
     );
 
-    expect(screen.getByRole("heading", { name: /turn pipeline failures/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /sign in with github/i })).toHaveAttribute(
-      "href",
-      "/api/auth/github",
-    );
-    expect(screen.getByRole("button", { name: /assess risk/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /your build broke/i })).toBeTruthy();
+    // Find the link with the specific href to avoid ambiguity
+    const githubLinks = screen.getAllByRole("link", { name: /connect github/i });
+    const githubLink = githubLinks.find((link) => link.getAttribute("href") === "/api/auth/github");
+    expect(githubLink).toBeTruthy();
+    expect(screen.getByRole("link", { name: /watch a real fix/i })).toBeTruthy();
   });
 });
