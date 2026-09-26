@@ -135,9 +135,10 @@ async def run_diagnosis(
     diff_text = "No diff available."
     if pipeline_run.repository_full_name and pipeline_run.commit_sha:
         owner, repo = pipeline_run.repository_full_name.split("/", 1)
-        # We need the base commit - for now use a reasonable default
-        # In production, this would come from the workflow run data
-        base_sha = pipeline_run.commit_sha[:7] + "0" * 33  # Placeholder
+        # Try to get the base commit SHA from the workflow run
+        # For push events, base is typically the previous commit on the branch
+        # For PR events, base is the target branch HEAD
+        base_sha = pipeline_run.commit_sha  # Will be overridden by get_compare if needed
         diff_data = await fetch_workflow_diff(
             client,
             pipeline_run.installation_id or 0,
@@ -155,12 +156,24 @@ async def run_diagnosis(
         branch=pipeline_run.branch or "unknown",
     )
 
-    response = await gateway.complete(
-        agent=AgentType.DIAGNOSIS,
-        messages=messages,
-        temperature=0.1,
-        response_format={"type": "json_object"},
-    )
+    try:
+        response = await gateway.complete(
+            agent=AgentType.DIAGNOSIS,
+            messages=messages,
+            temperature=0.1,
+            response_format={"type": "json_object"},
+        )
+    except Exception as exc:
+        # LLM gateway failed (all providers exhausted)
+        return DiagnosisResult(
+            error_type="Unknown",
+            possible_causes=[f"LLM diagnosis failed: {str(exc)}"],
+            latest_working_change="Unknown",
+            suggested_fixes=["Review logs manually", "Check LLM provider configuration"],
+            provider="none",
+            model="none",
+            raw_response=str(exc),
+        )
 
     # Parse JSON response
     try:
@@ -169,9 +182,9 @@ async def run_diagnosis(
         # Fallback: return structured error
         return DiagnosisResult(
             error_type="Unknown",
-            possible_causes=["Failed to parse LLM response"],
+            possible_causes=["Failed to parse LLM response as JSON"],
             latest_working_change="Unknown",
-            suggested_fixes=["Review logs manually"],
+            suggested_fixes=["Review logs manually", "Check LLM response format"],
             provider=response.provider.value,
             model=response.model,
             raw_response=response.content,

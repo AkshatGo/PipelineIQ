@@ -166,7 +166,7 @@ async def test_run_diagnosis_invalid_json(
         
         assert isinstance(result, DiagnosisResult)
         assert result.error_type == "Unknown"
-        assert "Failed to parse LLM response" in result.possible_causes
+        assert "Failed to parse LLM response as JSON" in result.possible_causes
 
 
 @pytest.mark.asyncio
