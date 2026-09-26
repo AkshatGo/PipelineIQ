@@ -9,7 +9,7 @@ from typing import Any
 
 from pipelineiq.config import Settings
 from pipelineiq.models import AutoFixExecution, AutoFixMemory, PipelineRun
-from pipelineiq.services.github_app import GitHubAppClient
+from pipelineiq.services.github_app import GitHubAppClient, GitHubAppError
 from pipelineiq.services.llm_gateway import AgentType, get_llm_gateway
 
 AUTOFIX_SYSTEM_PROMPT = (
@@ -242,8 +242,13 @@ async def apply_fix_files(
 ) -> str | None:
     """Apply fix files by creating blobs, trees, and commits."""
     try:
-        # Get the current tree SHA from the base commit
-        # For simplicity, we'll create blobs and a new tree
+        # Get the base tree SHA from the base commit
+        base_commit = await client.get_commit(installation_id, owner, repo, base_sha)
+        base_tree_sha = base_commit.get("tree", {}).get("sha")
+        if not base_tree_sha:
+            raise GitHubAppError("Failed to get base tree SHA from commit")
+
+        # Create blobs for each file
         file_entries = []
         for file in files:
             blob_result = await client.create_blob(
@@ -258,10 +263,10 @@ async def apply_fix_files(
                 }
             )
 
-        # Create new tree based on base tree
-        # Note: In a real implementation, we'd fetch the base tree SHA
-        # For now, we'll create a tree without base_tree
-        tree_result = await client.create_tree(installation_id, owner, repo, file_entries)
+        # Create new tree based on base tree (preserves all other files)
+        tree_result = await client.create_tree(
+            installation_id, owner, repo, file_entries, base_tree=base_tree_sha
+        )
         tree_sha = tree_result["sha"]
 
         # Create commit
@@ -273,10 +278,13 @@ async def apply_fix_files(
         )
         commit_sha = commit_result["sha"]
 
-        # Update the branch reference
-        await client.create_ref(
-            installation_id, owner, repo, branch, commit_sha
-        )
+        # Update the branch reference (try update first, fall back to create)
+        try:
+            await client.update_ref(installation_id, owner, repo, branch, commit_sha)
+        except GitHubAppError:
+            # Branch might not exist yet, try to create it
+            await client.create_ref(installation_id, owner, repo, branch, commit_sha)
+
         return commit_sha  # type: ignore[no-any-return]
     except Exception:
         return None

@@ -141,6 +141,19 @@ class GitHubAppClient:
             raise GitHubAppError(f"Failed to get workflow run: {response.text}")
         return response.json()  # type: ignore[no-any-return]
 
+    async def get_commit(
+        self, installation_id: int, owner: str, repo: str, sha: str
+    ) -> dict[str, Any]:
+        """Get a commit by SHA."""
+        async with httpx.AsyncClient(timeout=15) as client:
+            response = await client.get(
+                f"{self.settings.GITHUB_API_URL}/repos/{owner}/{repo}/git/commits/{sha}",
+                headers=await self._get_headers(installation_id),
+            )
+        if response.is_error:
+            raise GitHubAppError(f"Failed to get commit: {response.text}")
+        return response.json()  # type: ignore[no-any-return]
+
     async def get_compare(
         self, installation_id: int, owner: str, repo: str, base: str, head: str
     ) -> dict[str, Any]:
@@ -192,6 +205,20 @@ class GitHubAppClient:
             )
         if response.is_error:
             raise GitHubAppError(f"Failed to create ref: {response.text}")
+        return response.json()  # type: ignore[no-any-return]
+
+    async def update_ref(
+        self, installation_id: int, owner: str, repo: str, ref: str, sha: str, force: bool = True
+    ) -> dict[str, Any]:
+        """Update an existing git reference (branch)."""
+        async with httpx.AsyncClient(timeout=15) as client:
+            response = await client.patch(
+                f"{self.settings.GITHUB_API_URL}/repos/{owner}/{repo}/git/refs/heads/{ref}",
+                headers=await self._get_headers(installation_id),
+                json={"sha": sha, "force": force},
+            )
+        if response.is_error:
+            raise GitHubAppError(f"Failed to update ref: {response.text}")
         return response.json()  # type: ignore[no-any-return]
 
     async def create_commit(
