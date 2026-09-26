@@ -14,6 +14,7 @@ from pipelineiq.services.github_webhooks import (
     WebhookReceipt,
     verify_webhook_signature,
 )
+from pipelineiq.services.pipeline_runtime import process_pipeline_run_inline
 
 router = APIRouter(tags=["github"])
 
@@ -89,7 +90,7 @@ async def receive_github_webhook(
 
     intake = await get_webhook_intake()
     try:
-        return await intake.process(
+        receipt = await intake.process(
             delivery_id=x_github_delivery,
             event_type=x_github_event,
             payload=payload,
@@ -107,3 +108,10 @@ async def receive_github_webhook(
             code="GITHUB_WEBHOOK_UNPROCESSABLE",
             message=str(exc),
         ) from exc
+
+    # Trigger inline pipeline processing if Kafka is not enabled
+    settings = get_settings()
+    if not settings.KAFKA_ENABLED and not receipt.ignored and not receipt.duplicate:
+        await process_pipeline_run_inline(x_github_delivery, settings)
+
+    return receipt
