@@ -2,17 +2,16 @@
   "name": "pipelineiq",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "npm@12.0.1",
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "dev": "turbo run dev",
-    "build": "turbo run build",
-    "test": "turbo run test",
-    "lint": "turbo run lint",
-    "typecheck": "turbo run typecheck",
-    "check": "turbo run lint typecheck test"
+    "dev": "npm run dev --workspaces",
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces",
+    "typecheck": "npm run typecheck --workspaces",
+    "check": "npm run lint --workspaces && npm run typecheck --workspaces && npm run test --workspaces"
   },
   "devDependencies": {
     "turbo": "^2.5.6",
