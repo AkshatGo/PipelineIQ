@@ -1,64 +1,68 @@
+/** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    './index.html',
-    './*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './data/**/*.{ts,tsx}',
-    './utils/**/*.{ts,tsx}',
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
       colors: {
         ink: {
-          DEFAULT: '#12140F',
-          900: '#171912',
-          800: '#1F221A',
-          700: '#2B2E22',
+          DEFAULT: '#0f110a',
+          900: '#14160f',
+          800: '#1c1f15',
+          700: '#282c1e',
+          600: '#333728',
+          500: '#4a4f38',
         },
-        line: '#33362A',
-        muted: '#A6A08C',
-        paper: '#EDE6D6',
-        fail: { DEFAULT: '#B3452F', soft: '#DA7A62' },
-        copper: '#C98A3E',
-        warn: '#C98A3E',
-        fix: '#7C9A6B',
-        teal: { DEFAULT: '#2F6E6A', soft: '#7DB8B1' },
-        brass: '#9C7A3C',
-        lamp: '#F3E6C8',
+        copper: {
+          DEFAULT: '#c98a3e',
+          dim: '#a87232',
+          glow: 'rgba(201, 138, 62, 0.4)',
+        },
+        brass: {
+          DEFAULT: '#b8963a',
+          dim: '#9c7d2f',
+          glow: 'rgba(184, 150, 58, 0.4)',
+        },
+        fix: {
+          DEFAULT: '#6b8e5a',
+          bright: '#8fd476',
+          glow: 'rgba(107, 142, 90, 0.4)',
+        },
+        teal: {
+          DEFAULT: '#1f6f6b',
+          soft: '#4db8b1',
+          glow: 'rgba(31, 111, 107, 0.4)',
+        },
+        brass: {
+          DEFAULT: '#b8963a',
+          dim: '#9c7d2f',
+          glow: 'rgba(184, 150, 58, 0.4)',
+        },
+        lamp: {
+          DEFAULT: '#f5e6c8',
+          dim: '#e8d4a8',
+        },
+        fail: {
+          DEFAULT: '#c0392b',
+          soft: '#e87a6a',
+          glow: 'rgba(192, 57, 43, 0.4)',
+        },
+        warn: {
+          DEFAULT: '#c98a3e',
+        },
+        fix: {
+          DEFAULT: '#6b8e5a',
+          bright: '#8fd476',
+          glow: 'rgba(107, 142, 90, 0.4)',
+        },
       },
       fontFamily: {
-        sans: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
-        mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
-      },
-      borderRadius: {
-        sm: '3px',
-        DEFAULT: '4px',
-        md: '6px',
-        lg: '8px',
-      },
-      backgroundImage: {
-        signal: 'linear-gradient(95deg, #B3452F 0%, #C98A3E 55%, #7C9A6B 100%)',
-      },
-      keyframes: {
-        'marquee-left': {
-          from: { transform: 'translateX(0)' },
-          to: { transform: 'translateX(-50%)' },
-        },
-        'marquee-right': {
-          from: { transform: 'translateX(-50%)' },
-          to: { transform: 'translateX(0)' },
-        },
-        caret: {
-          '0%, 49%': { opacity: '1' },
-          '50%, 100%': { opacity: '0' },
-        },
-      },
-      animation: {
-        'marquee-left': 'marquee-left 70s linear infinite',
-        'marquee-right': 'marquee-right 70s linear infinite',
-        caret: 'caret 1s steps(1) infinite',
+        sans: ['Space Grotesk', 'system-ui', 'sans-serif'],
+        mono: ['IBM Plex Mono', 'monospace'],
       },
     },
   },
   plugins: [],
-};
+}
