@@ -5,7 +5,19 @@ from typing import Literal
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-ROOT_DIR = Path(__file__).resolve().parents[4]
+
+def find_root_dir() -> Path:
+    """Find the project root directory by looking for pyproject.toml or .git directory."""
+    current = Path(__file__).resolve().parent
+    while current != current.parent:
+        if (current / "pyproject.toml").exists() or (current / ".git").exists():
+            return current
+        current = current.parent
+    # Fallback to current working directory
+    return Path.cwd()
+
+
+ROOT_DIR = find_root_dir()
 
 
 class Settings(BaseSettings):

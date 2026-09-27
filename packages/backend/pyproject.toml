@@ -19,6 +19,7 @@ dependencies = [
   "aiokafka>=0.10,<1",
   "python-jose[cryptography]>=3.4,<4",
   "pyjwt>=2.8,<3",
+  "openai>=1.0,<2",
 ]
 
 [project.optional-dependencies]
